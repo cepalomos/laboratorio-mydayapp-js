@@ -1,34 +1,42 @@
-const TASKS = "tasks";
+const TASKS = "mydayapp-js";
 const addTask = (title) => {
   const store = getTasks();
   const id = self.crypto.randomUUID();
-  const task = { id, title, complete: false };
-  store[id] = task;
+  const task = { id, title, completed: false };
+  store.push(task);
   saveTasks(store);
 };
 const modifeTask = (id, newTitle) => {
   const store = getTasks();
-  store[id].title = newTitle;
+  for (const task of store) {
+    if (task.id === id) {
+      task.title = newTitle;
+    }
+  }
   saveTasks(store);
 };
 const deleteTask = (id) => {
   const store = getTasks();
-  store[id] = undefined;
-  saveTasks(store);
+  const newStore = store.filter((taskArray) => taskArray.id !== id);
+  saveTasks(newStore);
 };
 const completeTask = (id) => {
   const store = getTasks();
-  store[id].complete = true;
-  saveTasks(store);
+  const task = store.find((taskArray) => taskArray.id === id);
+  task.completed = true;
+  const newStore = store.filter((taskArray) => taskArray.id !== id);
+  saveTasks([...newStore, task]);
 };
 const unCompleteTask = (id) => {
   const store = getTasks();
-  store[id].complete = false;
-  saveTasks(store);
+  const task = store.find((taskArray) => taskArray.id === id);
+  task.completed = false;
+  const newStore = store.filter((taskArray) => taskArray.id !== id);
+  saveTasks([...newStore, task]);
 };
 const getTasks = () => {
   const store = JSON.parse(localStorage.getItem(TASKS));
-  return store ? store : {};
+  return store ? store : [];
 };
 const saveTasks = (tasks) => {
   const stringTasks = JSON.stringify(tasks);

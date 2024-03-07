@@ -4,6 +4,7 @@ import selector from "./selector";
 const footer = selector.footer;
 const main = selector.main;
 const inputTask = selector.inputTask;
+const listCount = selector.contador;
 // export const sayHello = (text) => {
 //   return text;
 // };
@@ -20,6 +21,7 @@ const loadMainFooter = () => {
     footer.style.setProperty("display", "block");
     main.style.setProperty("display", "block");
   }
+  listCounts(listCount);
 };
 
 const input = () => {
@@ -48,13 +50,13 @@ const updateMain = (container) => {
   ul.classList.add("todo-list");
   store.forEach((task) => {
     const li = document.createElement("li");
-    task.complete ? li.classList.add("completed") : null;
+    task.completed ? li.classList.add("completed") : null;
     const div = document.createElement("div");
     div.classList.add("view");
     const radio = document.createElement("input");
     radio.classList.add("toggle");
     radio.setAttribute("type", "checkbox");
-    if (task.complete) {
+    if (task.completed) {
       radio.setAttribute("checked", true);
     } else if (radio.getAttribute("checked")) {
       radio.removeAttribute("checked");
@@ -67,6 +69,7 @@ const updateMain = (container) => {
     div.appendChild(label);
     const btnDestroy = document.createElement("button");
     btnDestroy.classList.add("destroy");
+    btnDestroy.addEventListener("click", destroyTask(task.id));
     div.appendChild(btnDestroy);
     li.appendChild(div);
     const editInput = document.createElement("input");
@@ -78,6 +81,11 @@ const updateMain = (container) => {
     ul.appendChild(li);
   });
   container.appendChild(ul);
+};
+
+const destroyTask = (id) => () => {
+  storeLocal.deleteTask(id);
+  loadMainFooter();
 };
 
 const checkbox = (container, id) => {
@@ -110,6 +118,15 @@ const upgradeTask = (container, id) => (e) => {
   }
 };
 
+const listCounts = (container) => {
+  const span = document.createElement("span");
+  const store = storeLocal.getTasks();
+  store.length === 1
+    ? (span.innerText = `${store.length} item left`)
+    : (span.innerText = `${store.length} items lefts`);
+  container.innerHTML = "";
+  container.appendChild(span);
+};
 export default {
   loadMainFooter,
   input,
