@@ -54,12 +54,16 @@ const updateMain = (container) => {
     const radio = document.createElement("input");
     radio.classList.add("toggle");
     radio.setAttribute("type", "checkbox");
-    task.complete
-      ? radio.setAttribute("checked")
-      : radio.removeAttribute("checked");
+    if (task.complete) {
+      radio.setAttribute("checked", true);
+    } else if (radio.getAttribute("checked")) {
+      radio.removeAttribute("checked");
+    }
+    radio.addEventListener("change", checkbox(li, task.id), false);
     div.appendChild(radio);
     const label = document.createElement("label");
     label.textContent = task.title;
+    label.addEventListener("dblclick", editLabel(li));
     div.appendChild(label);
     const btnDestroy = document.createElement("button");
     btnDestroy.classList.add("destroy");
@@ -67,11 +71,43 @@ const updateMain = (container) => {
     li.appendChild(div);
     const editInput = document.createElement("input");
     editInput.classList.add("edit");
+    editInput.setAttribute("type", "text");
+    editInput.addEventListener("keydown", upgradeTask(li, task.id));
     editInput.value = task.title;
     li.appendChild(editInput);
     ul.appendChild(li);
   });
   container.appendChild(ul);
+};
+
+const checkbox = (container, id) => {
+  return (e) => {
+    if (e.target.checked) {
+      storeLocal.completeTask(id);
+      container.classList.add("completed");
+    } else {
+      storeLocal.unCompleteTask(id);
+      container.classList.remove("completed");
+    }
+  };
+};
+
+const editLabel = (container) => (e) => {
+  inputTask.removeAttribute("autofocus");
+  container.classList.remove("completed");
+  container.classList.add("editing");
+  e.target.focus();
+};
+
+const upgradeTask = (container, id) => (e) => {
+  if (e.key === "Enter") {
+    const title = e.target.value.trim();
+    if (title !== "") {
+      storeLocal.modifeTask(id, title);
+      container.classList.remove("editing");
+    }
+    loadMainFooter();
+  }
 };
 
 export default {

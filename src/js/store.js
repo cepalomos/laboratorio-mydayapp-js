@@ -9,6 +9,7 @@ const addTask = (title) => {
 const modifeTask = (id, newTitle) => {
   const store = getTasks();
   store[id].title = newTitle;
+  saveTasks(store);
 };
 const deleteTask = (id) => {
   const store = getTasks();
