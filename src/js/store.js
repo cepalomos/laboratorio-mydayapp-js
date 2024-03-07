@@ -50,4 +50,5 @@ export default {
   completeTask,
   getTasks,
   unCompleteTask,
+  saveTasks,
 };

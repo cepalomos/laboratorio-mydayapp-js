@@ -5,23 +5,26 @@ const footer = selector.footer;
 const main = selector.main;
 const inputTask = selector.inputTask;
 const listCount = selector.contador;
+const filters = selector.filters;
 // export const sayHello = (text) => {
 //   return text;
 // };
 
 const loadMainFooter = () => {
   const store = storeLocal.getTasks();
-  const values = Object.values(store);
-  if (values.length === 0 || values === null) {
+  if (store.length === 0) {
     footer.style.setProperty("display", "none");
     main.style.setProperty("display", "none");
   } else {
-    main.innerHTML = "";
-    updateMain(main);
     footer.style.setProperty("display", "block");
     main.style.setProperty("display", "block");
   }
-  listCounts(listCount);
+};
+
+const chargeData = (store) => {
+  main.innerHTML = "";
+  updateMain(main, store);
+  listCounts(listCount, store);
 };
 
 const input = () => {
@@ -41,11 +44,11 @@ const addTask = (e) => {
       inputTask.value = "";
     }
     loadMainFooter();
+    chargeData(storeLocal.getTasks());
   }
 };
 
-const updateMain = (container) => {
-  const store = Object.values(storeLocal.getTasks());
+const updateMain = (container, store) => {
   const ul = document.createElement("ul");
   ul.classList.add("todo-list");
   store.forEach((task) => {
@@ -86,6 +89,7 @@ const updateMain = (container) => {
 const destroyTask = (id) => () => {
   storeLocal.deleteTask(id);
   loadMainFooter();
+  chargeData(storeLocal.getTasks());
 };
 
 const checkbox = (container, id) => {
@@ -115,20 +119,72 @@ const upgradeTask = (container, id) => (e) => {
       container.classList.remove("editing");
     }
     loadMainFooter();
+    chargeData(storeLocal.getTasks());
   }
 };
 
-const listCounts = (container) => {
+const listCounts = (container, store) => {
   const span = document.createElement("span");
-  const store = storeLocal.getTasks();
   store.length === 1
     ? (span.innerText = `${store.length} item left`)
-    : (span.innerText = `${store.length} items lefts`);
+    : (span.innerText = `${store.length} items left`);
   container.innerHTML = "";
   container.appendChild(span);
+};
+
+const filterPending = () => {
+  menu("#/pending");
+  const store = storeLocal.getTasks().filter((task) => !task.completed);
+  chargeData(store);
+  listCounts(listCount, store);
+  loadMainFooter();
+};
+
+const filterCompleted = () => {
+  menu("#/completed");
+  const store = storeLocal.getTasks().filter((task) => task.completed);
+  chargeData(store);
+  listCounts(listCount, store);
+  loadMainFooter();
+};
+
+const notFilter = () => {
+  menu("#/");
+  const store = storeLocal.getTasks();
+  chargeData(store);
+  listCounts(listCount, store);
+  loadMainFooter();
+};
+
+const menu = (select) => {
+  filters.innerHTML = "";
+  const ref = ["#/", "#/pending", "#/completed"];
+  const text = ["All", "Pending", "Completed"];
+  ref.forEach((refElement, index) => {
+    const li = document.createElement("li");
+    const a = document.createElement("a");
+    a.setAttribute("href", refElement);
+    a.innerText = text[index];
+    if (select === refElement) {
+      a.classList.add("selected");
+    }
+    li.appendChild(a);
+    filters.appendChild(li);
+  });
+};
+
+const clearCompleted = () => {
+  const store = storeLocal.getTasks();
+  const newStore = store.filter((task) => !task.completed);
+  storeLocal.saveTasks(newStore);
+  chargeData(storeLocal.getTasks());
 };
 export default {
   loadMainFooter,
   input,
   addTask,
+  filterPending,
+  filterCompleted,
+  notFilter,
+  clearCompleted,
 };
