@@ -1,5 +1,6 @@
 import "./css/base.css";
+import utils from "./js/utils";
+// import selector from "./js/selector";
 
-import { sayHello } from "./js/utils";
-
-console.log(sayHello("Hello"));
+window.addEventListener("DOMContentLoaded", utils.loadMainFooter, false);
+document.addEventListener("keydown", utils.addTask);
